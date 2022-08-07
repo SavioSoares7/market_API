@@ -1,6 +1,9 @@
 const express = require("express");
 const app = express();
 
+const database = require("./database/sqlite");
+database();
+
 const routes = require("./routes");
 const AppError = require("./util/AppError");
 
