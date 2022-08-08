@@ -1,24 +1,33 @@
-const AppError = require("../model/util/AppError");
-
 const knex = require("../model/database/knex");
+
+const { hash } = require("bcryptjs");
+
 class UserControllers {
   async create(req, res) {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      throw new AppError("Por favor preencha todos os campos");
+      return res.status(400).json({
+        status: "Error",
+        message: "Preencha todos os campos",
+      });
     }
 
     const checkEmail = await knex("users").select("email").where({ email });
 
     if (checkEmail.length > 0) {
-      throw new AppError("Email já em uso");
+      return res.status(400).json({
+        status: "Error",
+        message: "Email já cadastado os campos",
+      });
     }
+
+    const hashed = await hash(password, 8);
 
     await knex("users").insert({
       name,
       email,
-      password,
+      password: hashed,
     });
 
     res.json();
